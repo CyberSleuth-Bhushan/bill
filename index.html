@@ -765,22 +765,15 @@ h1,h2,h3,h4{font-family:'Sora',sans-serif;font-weight:600}
 
 
 </html>
+<script src="config.js"></script>
 <script>
 // ══════════════════════════════════════════════════════════════
 //  FIREBASE CONFIG
 // ══════════════════════════════════════════════════════════════
-const firebaseConfig = {
-  apiKey: "AIzaSyCuP2qcgxKj6uuDuRQMaOozjQNedoMIEsY",
-  authDomain: "netbillisp.firebaseapp.com",
-  databaseURL: "https://netbillisp-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "netbillisp",
-  storageBucket: "netbillisp.firebasestorage.app",
-  messagingSenderId: "1024745870051",
-  appId: "1:1024745870051:web:1be586da9d1d78959a6bd6"
-};
+const firebaseConfig = CONFIG.FIREBASE;
 
-// ⚠️  Add your Razorpay Key ID here when available
-const RAZORPAY_KEY = "YOUR_RAZORPAY_KEY_ID";
+// Razorpay Key ID (secret stays server-side only)
+const RAZORPAY_KEY = CONFIG.RAZORPAY_KEY;
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
