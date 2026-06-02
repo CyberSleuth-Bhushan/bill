@@ -4,8 +4,12 @@
 // ══════════════════════════════════════════════════════════════
 
 const CONFIG = {
-  // Razorpay (Key ID only — secret stays server-side)
-  RAZORPAY_KEY: "rzp_live_SrCH347cwCz6Al",
+  // PayU Credentials
+  PAYU: {
+    KEY: "R5CD8P",
+    SALT: "9XG80AJ1EDDzbG0ogxCcD7guZWQ0pO5L",
+    ENV: "test" // Use "production" for live environment, "test" for UAT
+  },
 
   // Firebase
   FIREBASE: {
