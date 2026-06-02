@@ -456,6 +456,19 @@ h1, h2, h3, h4 {
 }
 .sb-collapse-btn:hover { background: rgba(255, 255, 255, 0.05); color: var(--tx); }
 .sidebar.collapsed .sb-collapse-btn { margin-left: 2px; }
+.sb-close-btn {
+  display: none;
+  background: none; border: none; color: var(--tx2); cursor: pointer; display: flex; align-items: center; justify-content: center;
+  padding: 6px; border-radius: 8px; transition: var(--tr); font-size: 1.4rem; line-height: 1;
+}
+.sb-close-btn:hover { background: rgba(255, 255, 255, 0.05); color: var(--tx); }
+
+.user-grid-hero {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
 
 .sb-nav { flex: 1; padding: 20px 14px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; overflow-x: hidden; }
 .sb-section { padding: 12px 14px 6px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--txm); }
@@ -544,6 +557,13 @@ h1, h2, h3, h4 {
   .topbar { padding: 0 24px; }
   .topbar-search-container { display: none !important; } /* hide on tablet/mobile search to avoid cramping */
 }
+@media (max-width: 900px) {
+  .user-grid-hero {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+}
 @media(max-width: 768px) {
   .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); box-shadow: 20px 0 50px rgba(0,0,0,0.7); height: 100vh; }
   .sidebar.open { transform: translateX(0); }
@@ -551,6 +571,89 @@ h1, h2, h3, h4 {
   .mobile-menu-btn { display: inline-flex; }
   .topbar { padding: 0 16px; height: 64px; }
   .content { padding: 16px; gap: 20px; }
+
+  /* Spacing and layout collapsing */
+  .sb-collapse-btn {
+    display: none !important;
+  }
+  .sb-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Scale down statistics layout */
+  .stat-value {
+    font-size: 1.75rem;
+  }
+  .uh-plan {
+    font-size: 1.6rem;
+  }
+
+  /* Make tables responsive with scrollbars */
+  .tbl-wrap {
+    box-shadow: inset -10px 0 10px -10px rgba(0,0,0,0.5);
+  }
+  .tbl-wrap::-webkit-scrollbar {
+    height: 4px;
+  }
+  .tbl-wrap::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+  }
+  .tbl th, .tbl td {
+    padding: 10px 12px;
+    font-size: 0.78rem;
+  }
+
+  /* Toast Notification positioning on mobile */
+  #toast {
+    bottom: 20px;
+    right: 16px;
+    left: 16px;
+    max-width: 100%;
+    margin: 0 auto;
+    font-size: 0.82rem;
+    padding: 12px 16px;
+  }
+
+  /* Chart mobile responsiveness */
+  .chart-container {
+    gap: 6px;
+    padding: 12px 4px 4px;
+    height: 160px;
+  }
+  .chart-lbl {
+    font-size: 0.65rem;
+  }
+
+  /* Padding scales */
+  .card, .stat-card, .user-hero, .mo-box, .drawer-body {
+    padding: 16px !important;
+  }
+  .drawer-head {
+    padding: 16px 20px !important;
+  }
+  
+  /* Topbar compactness */
+  .topbar {
+    height: 56px;
+    padding: 0 12px;
+  }
+  .topbar-title {
+    font-size: 1.05rem;
+  }
+  .topbar-l {
+    gap: 8px;
+  }
+  .topbar-r .btn-sm {
+    padding: 6px 10px;
+    font-size: 0.72rem;
+  }
+  .mobile-menu-btn {
+    font-size: 1.25rem;
+    padding: 4px;
+  }
 }
 
 /* ── STAT CARDS ── */
@@ -841,6 +944,7 @@ h1, h2, h3, h4 {
         <div class="sb-logo-text">NetShare</div>
       </div>
       <button class="sb-collapse-btn" onclick="toggleSidebarCollapse('user')">◂</button>
+      <button class="sb-close-btn" onclick="toggleSidebarMobile('user')">×</button>
     </div>
     <div class="sb-role" style="padding: 16px 24px 0 24px;">Member Hub</div>
     <nav class="sb-nav">
@@ -882,7 +986,8 @@ h1, h2, h3, h4 {
     <div class="content">
       <!-- USER HOME -->
       <div id="u-sec-home" class="view-panel">
-        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:24px; margin-bottom:24px;">
+        <div id="u-alert-container"></div>
+        <div class="user-grid-hero">
           <!-- Left Hero Card -->
           <div class="user-hero">
             <div class="uh-name">Welcome Back</div>
@@ -999,6 +1104,7 @@ h1, h2, h3, h4 {
         <div class="sb-logo-text">NetShare</div>
       </div>
       <button class="sb-collapse-btn" onclick="toggleSidebarCollapse('admin')">◂</button>
+      <button class="sb-close-btn" onclick="toggleSidebarMobile('admin')">×</button>
     </div>
     <div class="sb-nav">
       <div class="sb-section">Control Center</div>
@@ -1015,6 +1121,10 @@ h1, h2, h3, h4 {
       </div>
       <div class="nav-item" id="a-nav-payments" onclick="aSection('payments')">
         <span class="nav-icon">💳</span><span class="nav-label">Collections</span>
+      </div>
+      <div class="nav-item" id="a-nav-verifications" onclick="aSection('verifications')">
+        <span class="nav-icon">🔍</span><span class="nav-label">Verifications</span>
+        <span class="nav-badge hidden" id="nb-verifications">0</span>
       </div>
     </div>
     <div class="sb-foot">
@@ -1211,6 +1321,37 @@ h1, h2, h3, h4 {
           </div>
         </div>
       </div>
+
+      <!-- ADMIN: VERIFICATIONS -->
+      <div id="a-sec-verifications" class="hidden view-panel">
+        <div class="action-bar">
+          <div class="action-bar-title">
+            <h2>Manual QR Verifications</h2>
+            <p>Review UTR transaction reference numbers, confirm payment receipt, & approve or reject requests.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>Date Submitted</th>
+                  <th>Member Name</th>
+                  <th>Billing Month</th>
+                  <th>Amount</th>
+                  <th>UTR Number</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="a-verifications-body">
+                <tr><td colspan="7" class="tbl-empty">No pending manual QR payments.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -1427,12 +1568,52 @@ h1, h2, h3, h4 {
       <div class="mo-title">Process Invoice Payment</div>
       <button class="mo-close" onclick="closeModal('m-pay')">✕</button>
     </div>
-    <div id="m-pay-body" class="mo-form">
-      <!-- Loaded dynamically -->
+    
+    <!-- Payment Option Tabs -->
+    <div class="tabs" style="margin-bottom:16px; width:100%;">
+      <div class="tab active" id="pay-tab-payu" onclick="switchPayMethod('payu')" style="flex:1; text-align:center;">PayU (Fast Payment)</div>
+      <div class="tab" id="pay-tab-manual" onclick="switchPayMethod('manual')" style="flex:1; text-align:center;">Manual QR (Slow Payment)</div>
     </div>
-    <div class="mo-foot" style="margin-top:20px">
-      <button class="btn btn-ghost" onclick="closeModal('m-pay')">Cancel</button>
-      <button class="btn btn-primary" id="pay-now-btn" onclick="launchPayU()">Confirm & Pay</button>
+
+    <!-- PayU Option Section -->
+    <div id="pay-body-payu" class="mo-form">
+      <div id="m-pay-body">
+        <!-- Loaded dynamically -->
+      </div>
+      <div class="mo-foot" style="margin-top:20px">
+        <button class="btn btn-ghost" onclick="closeModal('m-pay')">Cancel</button>
+        <button class="btn btn-primary" id="pay-now-btn" onclick="launchPayU()">Confirm & Pay</button>
+      </div>
+    </div>
+
+    <!-- Manual QR Option Section -->
+    <div id="pay-body-manual" class="mo-form hidden">
+      <div class="info-alert in">
+        <div class="alert-icon">📅</div>
+        <div>
+          <div class="alert-title">Manual QR Directions</div>
+          <div class="alert-sub">Scan the QR code below, execute the transfer using your preferred UPI app, and paste the 12-digit UTR reference code below.</div>
+        </div>
+      </div>
+      
+      <div style="display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:12px;">
+        <div class="card card-pad" style="border: 1px solid var(--b); background:rgba(0,0,0,0.2); text-align:center; width:100%; display:flex; flex-direction:column; align-items:center;">
+          <img src="pay.png" alt="Scan QR Code" style="max-width:200px; border-radius:10px; border: 1px solid rgba(255,255,255,0.1); margin-bottom:8px;" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=netsyc@upi'; this.onerror=null;">
+          <div style="font-weight:700; font-size:1.15rem; color:var(--a);" id="manual-pay-amount-label">₹0</div>
+          <div style="font-size:0.75rem; color:var(--tx2)">Scan & Pay Exact Amount</div>
+        </div>
+      </div>
+      
+      <div class="fg" style="margin-top:12px;">
+        <label>Transaction UTR / Reference Number*</label>
+        <input type="text" id="pay-manual-utr" placeholder="Enter 12-digit UTR Number">
+        <span class="fg-hint">Found on payment success receipt in UPI app (GPay, PhonePe, Paytm, etc.).</span>
+      </div>
+
+      <div class="mo-foot" style="margin-top:20px">
+        <button class="btn btn-ghost" onclick="closeModal('m-pay')">Cancel</button>
+        <button class="btn btn-primary" id="manual-pay-submit-btn" onclick="submitManualQRRef()">Submit UTR Number</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1636,6 +1817,7 @@ function statusBadge(s) {
   if (s === 'active')    return `<span class="badge bg-ok"><span class="dot dot-p"></span>Active</span>`;
   if (s === 'suspended') return `<span class="badge bg-er"><span class="dot"></span>Suspended</span>`;
   if (s === 'pending')   return `<span class="badge bg-wa"><span class="dot"></span>Pending</span>`;
+  if (s === 'verification_pending') return `<span class="badge bg-wa"><span class="dot dot-p"></span>Under Verification</span>`;
   return `<span class="badge bg-mu">${s}</span>`;
 }
 function billStatusBadge(s) {
@@ -1643,6 +1825,7 @@ function billStatusBadge(s) {
   if (s === 'unpaid')  return `<span class="badge bg-er">Unpaid</span>`;
   if (s === 'overdue') return `<span class="badge bg-wa">Overdue</span>`;
   if (s === 'partial') return `<span class="badge bg-am">Partial</span>`;
+  if (s === 'verification_pending' || s === 'Under Verification') return `<span class="badge bg-wa"><span class="dot dot-p"></span>Under Verification</span>`;
   return `<span class="badge bg-mu">${s||'—'}</span>`;
 }
 function rupee(n) { return '₹' + Number(n||0).toLocaleString('en-IN'); }
@@ -1657,12 +1840,136 @@ function billTotal(bill) {
 function isOverdue(bill) {
   if (!bill.dueDate) return false;
   const due = bill.dueDate.toDate ? bill.dueDate.toDate() : new Date(bill.dueDate);
-  return new Date() > due && bill.status !== 'paid';
+  return new Date() > due && bill.status !== 'paid' && bill.status !== 'verification_pending';
 }
 
+async function checkUserOverdueSuspension(userId) {
+  try {
+    const userSnap = await db.collection('users').doc(userId).get();
+    if (!userSnap.exists) return;
+    const u = userSnap.data();
+    if (u.role === 'admin') return;
+
+    const billsSnap = await db.collection('bills')
+      .where('userId', '==', userId)
+      .where('status', '==', 'unpaid')
+      .get();
+
+    let hasOverdue = false;
+    let overdueBillId = '';
+    const today = new Date();
+
+    billsSnap.forEach(doc => {
+      const b = doc.data();
+      if (b.dueDate) {
+        const due = b.dueDate.toDate ? b.dueDate.toDate() : new Date(b.dueDate);
+        if (today > due) {
+          hasOverdue = true;
+          overdueBillId = doc.id;
+        }
+      }
+    });
+
+    const now = firebase.firestore.FieldValue.serverTimestamp();
+
+    if (hasOverdue) {
+      if (u.connectionStatus !== 'suspended' && u.connectionStatus !== 'verification_pending' && !u.adminOverrideActive) {
+        await db.collection('users').doc(userId).update({
+          connectionStatus: 'suspended',
+          statusNote: `Suspended automatically due to overdue bill (ID: ${overdueBillId})`,
+          statusUpdatedAt: now
+        });
+        return true;
+      }
+    } else {
+      if (u.connectionStatus === 'suspended' && u.statusNote && u.statusNote.includes('Suspended automatically')) {
+        await db.collection('users').doc(userId).update({
+          connectionStatus: 'active',
+          statusNote: 'Reactivated automatically: no overdue bills found',
+          statusUpdatedAt: now,
+          adminOverrideActive: false
+        });
+      }
+    }
+  } catch (e) {
+    console.error("Error in checkUserOverdueSuspension:", e);
+  }
+}
+
+async function checkAllOverdueSuspensions() {
+  try {
+    const [usersSnap, billsSnap] = await Promise.all([
+      db.collection('users').where('role', '==', 'user').get(),
+      db.collection('bills').where('status', '==', 'unpaid').get()
+    ]);
+
+    const today = new Date();
+    const now = firebase.firestore.FieldValue.serverTimestamp();
+    const batch = db.batch();
+    let updatedCount = 0;
+
+    const userUnpaidBills = {};
+    billsSnap.docs.forEach(doc => {
+      const b = doc.data();
+      const userId = b.userId;
+      if (!userUnpaidBills[userId]) userUnpaidBills[userId] = [];
+      userUnpaidBills[userId].push({ id: doc.id, ...b });
+    });
+
+    usersSnap.docs.forEach(userDoc => {
+      const userId = userDoc.id;
+      const u = userDoc.data();
+      const unpaidBills = userUnpaidBills[userId] || [];
+
+      let hasOverdue = false;
+      let overdueBillId = '';
+      unpaidBills.forEach(b => {
+        if (b.dueDate) {
+          const due = b.dueDate.toDate ? b.dueDate.toDate() : new Date(b.dueDate);
+          if (today > due) {
+            hasOverdue = true;
+            overdueBillId = b.id;
+          }
+        }
+      });
+
+      if (hasOverdue) {
+        if (u.connectionStatus !== 'suspended' && u.connectionStatus !== 'verification_pending' && !u.adminOverrideActive) {
+          batch.update(db.collection('users').doc(userId), {
+            connectionStatus: 'suspended',
+            statusNote: `Suspended automatically due to overdue bill (ID: ${overdueBillId})`,
+            statusUpdatedAt: now
+          });
+          updatedCount++;
+        }
+      } else {
+        if (u.connectionStatus === 'suspended' && u.statusNote && u.statusNote.includes('Suspended automatically')) {
+          batch.update(db.collection('users').doc(userId), {
+            connectionStatus: 'active',
+            statusNote: 'Reactivated automatically: no overdue bills found',
+            statusUpdatedAt: now,
+            adminOverrideActive: false
+          });
+          updatedCount++;
+        }
+      }
+    });
+
+    if (updatedCount > 0) {
+      await batch.commit();
+      console.log(`Auto-suspended/Reactivated ${updatedCount} users.`);
+    }
+  } catch (e) {
+    console.error("Error in checkAllOverdueSuspensions:", e);
+  }
+}
+
+
 // ── CUSTOM CONFIRM DIALOG ──
-function confirmAction(msg, callback) {
+function confirmAction(msg, callback, title = 'Are you sure?') {
   document.getElementById('confirm-dialog-msg').textContent = msg;
+  const titleEl = document.querySelector('#m-confirm .mo-title');
+  if (titleEl) titleEl.textContent = title;
   confirmCallbackFn = callback;
   openModal('m-confirm');
 }
@@ -1903,6 +2210,11 @@ function initUser() {
 }
 
 function uSection(name) {
+  const sb = document.querySelector('#user-app .sidebar');
+  if (sb && sb.classList.contains('open')) {
+    toggleSidebarMobile('user');
+  }
+
   ['home','bills','payments'].forEach(s => {
     document.getElementById(`u-sec-${s}`).classList.toggle('hidden', s !== name);
     document.getElementById(`u-nav-${s}`).classList.toggle('active', s === name);
@@ -1915,6 +2227,9 @@ function uSection(name) {
 }
 
 async function loadUserHome() {
+  // Check for auto-suspensions before pulling user details
+  await checkUserOverdueSuspension(CU.uid);
+
   // Pull fresh user details
   const snap = await db.collection('users').doc(CU.uid).get();
   CD = snap.data();
@@ -1922,7 +2237,9 @@ async function loadUserHome() {
   const connClass = CD.connectionStatus === 'active' ? 'conn-ok'
                   : CD.connectionStatus === 'suspended' ? 'conn-sus' : 'conn-pen';
   const connLabel = CD.connectionStatus === 'active' ? '🟢 Connection Active'
-                  : CD.connectionStatus === 'suspended' ? '🔴 Connection Suspended' : '🟡 Allocation Pending';
+                  : CD.connectionStatus === 'suspended' ? '🔴 Connection Suspended'
+                  : CD.connectionStatus === 'verification_pending' ? '🟡 Payment under verification by ADMIN please wait 24 hrs'
+                  : '🟡 Allocation Pending';
 
   document.getElementById('u-hero-plan').textContent   = CD.planName || '—';
   document.getElementById('u-hero-ip').textContent     = CD.ip ? `IP Address: ${CD.ip}` : 'Static IP: Unassigned';
@@ -1931,6 +2248,32 @@ async function loadUserHome() {
   document.getElementById('u-hero-bday').textContent   = CD.billingDay ? `${CD.billingDay}${nth(CD.billingDay)} of month` : '—';
   document.getElementById('u-hero-dday').textContent   = CD.dueDay ? `${CD.dueDay}${nth(CD.dueDay)} of month` : '—';
   document.getElementById('u-conn-badge').innerHTML    = statusBadge(CD.connectionStatus);
+
+  // Alert notices
+  const alertContainer = document.getElementById('u-alert-container');
+  if (alertContainer) {
+    if (CD.connectionStatus === 'suspended') {
+      alertContainer.innerHTML = `
+        <div class="info-alert er" style="margin-bottom:24px;">
+          <div class="alert-icon">🔴</div>
+          <div>
+            <div class="alert-title">Connection Suspended</div>
+            <div class="alert-sub">Your connection has been suspended because the payment due date has passed. Please pay your outstanding bill immediately via PayU for automatic reactivation, or submit manual QR verification.</div>
+          </div>
+        </div>`;
+    } else if (CD.connectionStatus === 'verification_pending') {
+      alertContainer.innerHTML = `
+        <div class="info-alert wa" style="margin-bottom:24px;">
+          <div class="alert-icon">⏳</div>
+          <div>
+            <div class="alert-title">Manual Payment Under Verification</div>
+            <div class="alert-sub">Your manual payment is under verification by ADMIN. Please wait 24 hrs. Once approved, your connection will be reactivated automatically.</div>
+          </div>
+        </div>`;
+    } else {
+      alertContainer.innerHTML = '';
+    }
+  }
 
   await loadCurrentBillWidget();
   await renderUserProgressRing();
@@ -2022,10 +2365,12 @@ async function loadCurrentBillWidget() {
           </div>
           <div style="text-align:right">
             ${billStatusBadge(overdue ? 'overdue' : bill.status)}
-            ${bill.status !== 'paid' ? `<div style="margin-top:6px"><button class="btn btn-primary btn-sm" onclick="openPayModal('${bill.id}')">Pay Statement</button></div>` : ''}
+            ${(bill.status !== 'paid' && bill.status !== 'verification_pending') ? `<div style="margin-top:6px"><button class="btn btn-primary btn-sm" onclick="openPayModal('${bill.id}')">Pay Statement</button></div>` : ''}
+            ${bill.status === 'verification_pending' ? `<div style="font-size:0.75rem; color:var(--wa); margin-top:6px; font-weight:600;">Verification Pending</div>` : ''}
           </div>
         </div>
         <div class="bill-card-body">
+          ${bill.status === 'verification_pending' ? `<div class="info-alert wa" style="margin-bottom:16px;"><div class="alert-icon">⏳</div><div><div class="alert-title">Manual QR Verification Pending</div><div class="alert-sub">Your manual QR transaction (UTR: ${bill.utrNumber || 'N/A'}) is under verification. Activations occur within 24 hours of submission.</div></div></div>` : ''}
           <div class="bill-row"><span class="bill-row-lbl">Plan Base Rate</span><span class="bill-row-val">${rupee(bill.baseAmount)}</span></div>
           ${(bill.additionalCharges||[]).map(c => `
             <div class="bill-row"><span class="bill-row-lbl">+ Extra charges (${c.reason})</span><span class="bill-row-val" style="color:var(--wa)">${rupee(c.amount)}</span></div>
@@ -2096,7 +2441,7 @@ async function loadUserBills() {
         <td class="tbl-actions">
           <button class="btn btn-ghost btn-xs" onclick="openBillDetail('${b.id}')">View</button>
           <button class="btn btn-in btn-xs" onclick="openBillDetail('${b.id}',true)">PDF</button>
-          ${b.status !== 'paid' ? `<button class="btn btn-primary btn-xs" onclick="openPayModal('${b.id}')">Pay</button>` : ''}
+          ${(b.status !== 'paid' && b.status !== 'verification_pending') ? `<button class="btn btn-primary btn-xs" onclick="openPayModal('${b.id}')">Pay</button>` : ''}
         </td>
       </tr>`;
     }).join('');
@@ -2235,6 +2580,9 @@ async function openPayModal(billId) {
   const total = billTotal(bill);
   currentPayBill = { ...bill, id: billId, total };
 
+  // Set default selection to PayU
+  switchPayMethod('payu');
+
   document.getElementById('m-pay-body').innerHTML = `
     <div class="info-alert in">
       <div class="alert-icon">⚡</div>
@@ -2250,6 +2598,11 @@ async function openPayModal(billId) {
       ${bill.lateFeeApplied ? `<div class="bill-row"><span class="bill-row-lbl">+ Late Penalty Fee</span><span class="bill-row-val" style="color:var(--er)">${rupee(bill.lateFee)}</span></div>` : ''}
       <div class="bill-row total"><span class="bill-row-lbl">Amount Payable</span><span class="bill-row-val">${rupee(total)}</span></div>
     </div>`;
+
+  // Update Manual Payment Amount Label & Reset input
+  document.getElementById('manual-pay-amount-label').textContent = rupee(total);
+  document.getElementById('pay-manual-utr').value = '';
+
   openModal('m-pay');
 }
 
@@ -2343,6 +2696,13 @@ async function onPaymentSuccess(payuResponse) {
     await db.collection('bills').doc(currentPayBill.id).update({
       status: 'paid', paidAt: now, paymentId: payuId
     });
+
+    await db.collection('users').doc(CU.uid).update({
+      connectionStatus: 'active',
+      adminOverrideActive: false,
+      statusNote: 'Paid successfully via PayU',
+      statusUpdatedAt: now
+    });
     
     toast(`Payment transaction successful! ${rupee(currentPayBill.total)}`, 'ok');
     loadUserHome();
@@ -2380,11 +2740,16 @@ async function cacheUsersForSearch() {
 }
 
 function aSection(name) {
-  ['overview','users','bills','payments'].forEach(s => {
+  const sb = document.querySelector('#admin-app .sidebar');
+  if (sb && sb.classList.contains('open')) {
+    toggleSidebarMobile('admin');
+  }
+
+  ['overview','users','bills','payments','verifications'].forEach(s => {
     document.getElementById(`a-sec-${s}`).classList.toggle('hidden', s !== name);
     document.getElementById(`a-nav-${s}`).classList.toggle('active', s === name);
   });
-  const titles = { overview:'Overview Dashboard', users:'Member Directory', bills:'Invoice Ledger', payments:'Collections Registry' };
+  const titles = { overview:'Overview Dashboard', users:'Member Directory', bills:'Invoice Ledger', payments:'Collections Registry', verifications:'Manual Verifications' };
   document.getElementById('a-topbar-title').textContent = titles[name];
 
   const topR = document.getElementById('a-topbar-r');
@@ -2395,18 +2760,30 @@ function aSection(name) {
   if (name === 'users')    loadAdminUsers();
   if (name === 'bills')    loadAdminBills();
   if (name === 'payments') loadAdminPayments();
+  if (name === 'verifications') loadAdminVerifications();
 }
 
 async function loadAdminOverview() {
+  await checkAllOverdueSuspensions();
   const tbody = document.getElementById('a-ov-pending');
   tbody.innerHTML = `<tr><td colspan="6">${getTableSkeleton(2, 6)}</td></tr>`;
   
   try {
-    const [usersSnap, billsSnap, paysSnap] = await Promise.all([
+    const [usersSnap, billsSnap, paysSnap, verificationsSnap] = await Promise.all([
       db.collection('users').where('role','==','user').get(),
       db.collection('bills').where('month','==',curMonthStr()).get(),
-      db.collection('payments').where('month','==',curMonthStr()).get()
+      db.collection('payments').where('month','==',curMonthStr()).get(),
+      db.collection('payments').where('status', '==', 'Under Verification').get()
     ]);
+
+    // Update verifications pending badge count
+    const nbVer = document.getElementById('nb-verifications');
+    if (verificationsSnap.size > 0) {
+      nbVer.textContent = verificationsSnap.size;
+      nbVer.classList.remove('hidden');
+    } else {
+      nbVer.classList.add('hidden');
+    }
 
     const users = usersSnap.docs.map(d=>d.data());
     const active = users.filter(u=>u.connectionStatus==='active').length;
@@ -2580,6 +2957,7 @@ async function buildSystemLogsFeed(paysSnap, billsSnap, usersSnap) {
 
 // ── MEMBER DIRECTORY ──
 async function loadAdminUsers() {
+  await checkAllOverdueSuspensions();
   const grid = document.getElementById('a-user-grid');
   grid.innerHTML = getCardSkeleton(3);
   
@@ -2639,6 +3017,7 @@ function renderUsersGrid(usersList) {
 
 // ── BILLING LEDGER ──
 async function loadAdminBills() {
+  await checkAllOverdueSuspensions();
   const wrap = document.getElementById('a-bills-wrap');
   wrap.innerHTML = getTableSkeleton(5, 9);
   
@@ -2849,11 +3228,21 @@ async function saveUser() {
 
   try {
     if (editUserId) {
-      await db.collection('users').doc(editUserId).update({
+      const updateData = {
         name, mobile, email, planName: plan, planAmount: amount, ip, connectionStatus: status,
         billingDay: bday, dueDay: dday, lateAmount: due, address: addr,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      };
+      if (status === 'active') {
+        updateData.adminOverrideActive = true;
+        updateData.statusNote = 'Activated manually by administrator';
+      } else {
+        updateData.adminOverrideActive = false;
+        if (status === 'suspended') {
+          updateData.statusNote = 'Suspended manually by administrator';
+        }
+      }
+      await db.collection('users').doc(editUserId).update(updateData);
       toast(`Subscriber profile ${name} updated successfully`, 'ok');
     } else {
       // Use Firebase REST signUp method to prevent admin account logout
@@ -2866,12 +3255,17 @@ async function saveUser() {
       if (data.error) throw new Error(data.error.message);
       const uid = data.localId;
 
-      await db.collection('users').doc(uid).set({
+      const userData = {
         name, mobile, email, planName: plan, planAmount: amount, ip, connectionStatus: status,
         billingDay: bday, dueDay: dday, lateAmount: due, address: addr,
         role: 'user', needsPasswordReset: true,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      };
+      if (status === 'active') {
+        userData.adminOverrideActive = true;
+        userData.statusNote = 'Activated manually by administrator';
+      }
+      await db.collection('users').doc(uid).set(userData);
       toast(`Member account ${name} registered successfully. Password: INTERNET123`, 'ok');
     }
     closeModal('m-user');
@@ -3357,6 +3751,226 @@ function refreshActiveView() {
   if (activeTab === 'users')    loadAdminUsers();
   if (activeTab === 'bills')    loadAdminBills();
   if (activeTab === 'payments') loadAdminPayments();
+  if (activeTab === 'verifications') loadAdminVerifications();
+}
+
+// ── CUSTOM MANUAL PAYMENT ROUTINES ──
+function switchPayMethod(method) {
+  const isPayU = method === 'payu';
+  document.getElementById('pay-tab-payu').classList.toggle('active', isPayU);
+  document.getElementById('pay-tab-manual').classList.toggle('active', !isPayU);
+  document.getElementById('pay-body-payu').classList.toggle('hidden', !isPayU);
+  document.getElementById('pay-body-manual').classList.toggle('hidden', isPayU);
+}
+
+async function submitManualQRRef() {
+  if (!currentPayBill) return;
+  const utr = document.getElementById('pay-manual-utr').value.trim();
+  if (!utr) {
+    toast('UTR / Reference number is required.', 'er');
+    return;
+  }
+  if (utr.length < 6) {
+    toast('Please enter a valid transaction reference (min 6 characters).', 'er');
+    return;
+  }
+
+  const subBtn = document.getElementById('manual-pay-submit-btn');
+  const origText = subBtn.textContent;
+  subBtn.disabled = true; subBtn.textContent = 'Submitting...';
+
+  try {
+    const now = firebase.firestore.FieldValue.serverTimestamp();
+    const payId = 'QR_' + Date.now();
+
+    const batch = db.batch();
+    const payRef = db.collection('payments').doc();
+    
+    batch.set(payRef, {
+      userId: CU.uid,
+      billId: currentPayBill.id,
+      month: currentPayBill.month,
+      amount: currentPayBill.total,
+      payuPaymentId: payId,
+      payuTxnId: utr,
+      payuMode: 'manual_qr',
+      status: 'Under Verification',
+      submittedAt: now,
+      paidAt: null
+    });
+
+    batch.update(db.collection('bills').doc(currentPayBill.id), {
+      status: 'verification_pending',
+      utrNumber: utr,
+      paymentId: payId
+    });
+
+    batch.update(db.collection('users').doc(CU.uid), {
+      connectionStatus: 'verification_pending',
+      adminOverrideActive: false,
+      statusNote: 'Payment under verification by ADMIN please wait 24 hrs',
+      statusUpdatedAt: now
+    });
+
+    await batch.commit();
+
+    toast('Verification request submitted successfully!', 'ok');
+    closeModal('m-pay');
+    
+    confirmAction(
+      'Your manual payment submission (UTR: ' + utr + ') has been recorded. It will be verified by our administrator within 24 hours. Your connection will be updated upon approval.', 
+      () => {}, 
+      'Verification Pending'
+    );
+
+    loadUserHome();
+  } catch (e) {
+    toast('Submission failed: ' + e.message, 'er');
+  } finally {
+    subBtn.disabled = false; subBtn.textContent = origText;
+  }
+}
+
+async function loadAdminVerifications() {
+  const tbody = document.getElementById('a-verifications-body');
+  tbody.innerHTML = `<tr><td colspan="7">${getTableSkeleton(3, 7)}</td></tr>`;
+  try {
+    const [paysSnap, usersSnap] = await Promise.all([
+      db.collection('payments').where('status', '==', 'Under Verification').get(),
+      db.collection('users').where('role', '==', 'user').get()
+    ]);
+    const userMap = {};
+    usersSnap.docs.forEach(d => userMap[d.id] = d.data());
+
+    const verificationsCount = paysSnap.size;
+    const badge = document.getElementById('nb-verifications');
+    if (verificationsCount > 0) {
+      badge.textContent = verificationsCount;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+
+    if (paysSnap.empty) {
+      tbody.innerHTML = '<tr><td colspan="7" class="tbl-empty">No pending manual QR payments.</td></tr>';
+      return;
+    }
+
+    const sortedDocs = paysSnap.docs.sort((a,b) => {
+      const ta = a.data().submittedAt?.toDate?.() || new Date(0);
+      const tb = b.data().submittedAt?.toDate?.() || new Date(0);
+      return tb - ta;
+    });
+
+    tbody.innerHTML = sortedDocs.map(doc => {
+      const p = { id: doc.id, ...doc.data() };
+      const u = userMap[p.userId] || {};
+      return `<tr>
+        <td style="font-size:0.8rem; color:var(--tx2)">${p.submittedAt ? fmtDateTime(p.submittedAt) : '—'}</td>
+        <td><strong>${u.name || p.userId}</strong><br><span style="font-size:0.72rem; color:var(--tx2)">${u.mobile || ''}</span></td>
+        <td>${fmtMonth(p.month)}</td>
+        <td style="font-weight:700; font-family:'JetBrains Mono',monospace; color:var(--a)">${rupee(p.amount)}</td>
+        <td style="font-family:'JetBrains Mono',monospace; font-weight:600; color:var(--tx)">${p.payuTxnId || 'N/A'}</td>
+        <td><span class="badge bg-wa"><span class="dot dot-p"></span>Verifying</span></td>
+        <td class="tbl-actions">
+          <button class="btn btn-ok btn-xs" onclick="approveManualPayment('${p.id}')">Approve</button>
+          <button class="btn btn-er btn-xs" onclick="rejectManualPayment('${p.id}')">Reject</button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="7" class="tbl-empty">Error loading verifications: ${e.message}</td></tr>`;
+  }
+}
+
+function approveManualPayment(paymentId) {
+  confirmAction('Are you sure you want to APPROVE this payment reference? The corresponding bill will be marked as paid and the user connection status will become Active.', async () => {
+    showLoader();
+    try {
+      const paymentDoc = await db.collection('payments').doc(paymentId).get();
+      if (!paymentDoc.exists) throw new Error('Payment record not found.');
+      const p = paymentDoc.data();
+      
+      const now = firebase.firestore.FieldValue.serverTimestamp();
+
+      const batch = db.batch();
+      
+      batch.update(db.collection('payments').doc(paymentId), {
+        status: 'paid',
+        paidAt: now
+      });
+      
+      batch.update(db.collection('bills').doc(p.billId), {
+        status: 'paid',
+        paidAt: now,
+        paymentId: paymentId
+      });
+      
+      batch.update(db.collection('users').doc(p.userId), {
+        connectionStatus: 'active',
+        adminOverrideActive: false,
+        statusNote: 'Payment approved manually (UTR: ' + (p.payuTxnId || 'N/A') + ')',
+        statusUpdatedAt: now
+      });
+      
+      await batch.commit();
+      toast('Payment approved successfully! Customer connection is now Active.', 'ok');
+      
+      cacheUsersForSearch();
+      loadAdminVerifications();
+      refreshActiveView();
+    } catch (e) {
+      toast('Approval failed: ' + e.message, 'er');
+    } finally {
+      hideLoader();
+    }
+  });
+}
+
+function rejectManualPayment(paymentId) {
+  confirmAction('Are you sure you want to REJECT this payment reference? The corresponding bill status will return to Unpaid.', async () => {
+    showLoader();
+    try {
+      const paymentDoc = await db.collection('payments').doc(paymentId).get();
+      if (!paymentDoc.exists) throw new Error('Payment record not found.');
+      const p = paymentDoc.data();
+      
+      const now = firebase.firestore.FieldValue.serverTimestamp();
+      
+      const batch = db.batch();
+      
+      batch.update(db.collection('payments').doc(paymentId), {
+        status: 'rejected',
+        rejectedAt: now
+      });
+      
+      batch.update(db.collection('bills').doc(p.billId), {
+        status: 'unpaid',
+        utrNumber: firebase.firestore.FieldValue.delete(),
+        paymentId: firebase.firestore.FieldValue.delete()
+      });
+
+      batch.update(db.collection('users').doc(p.userId), {
+        connectionStatus: 'active',
+        adminOverrideActive: false,
+        statusNote: 'Payment reference rejected by administrator',
+        statusUpdatedAt: now
+      });
+      
+      await batch.commit();
+      toast('Payment reference rejected. Bill reverted to Unpaid.', 'wa');
+
+      // Check if user should be suspended if the bill is overdue
+      await checkUserOverdueSuspension(p.userId);
+      
+      loadAdminVerifications();
+      refreshActiveView();
+    } catch (e) {
+      toast('Rejection failed: ' + e.message, 'er');
+    } finally {
+      hideLoader();
+    }
+  });
 }
 
 // Close modals when clicking overlay wrapper backdrop
